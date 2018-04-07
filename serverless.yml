@@ -1,0 +1,69 @@
+service: serverless-github-data
+
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  tableName: 'github-table-${self:provider.stage}'
+  dynamodb:
+    start:
+      migrate: true
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  environment:
+    GITHUB_CLIENT: ${file(./env.yml):CLIENT}
+    GITHUB_SECRET: ${file(./env.yml):SECRET}
+    GITHUB_TABLE: ${self:custom.tableName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["GithubDynamoDBTable", "Arn" ] }
+
+functions:
+  app:
+    handler: index.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+  getGithub:
+    handler: index.handler
+    events:
+      - http: 'GET /github/{proxy+}'
+  createGithub:
+    handler: index.handler
+    events:
+      - http: 'POST /github'
+
+resources:
+  Resources:
+    GithubDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: githubId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: githubId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}
