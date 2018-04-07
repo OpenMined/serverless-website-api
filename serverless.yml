@@ -2,7 +2,7 @@ service: serverless-github-data
 
 plugins:
   - serverless-webpack
-  - serverless-dynamodb-local
+  # - serverless-dynamodb-local
   - serverless-offline
 
 custom:
@@ -16,12 +16,11 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs8.10
   stage: ${opt:stage, 'dev'}
   region: us-east-1
   environment:
-    GITHUB_CLIENT: ${file(./env.yml):CLIENT}
-    GITHUB_SECRET: ${file(./env.yml):SECRET}
+    ACCESS_TOKEN: ${file(./env.yml):ACCESS_TOKEN}
     GITHUB_TABLE: ${self:custom.tableName}
   iamRoleStatements:
     - Effect: Allow

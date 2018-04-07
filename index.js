@@ -1,8 +1,11 @@
-const serverless = require('serverless-http');
-const bodyParser = require('body-parser');
-const express = require('express');
+import serverless from 'serverless-http';
+import bodyParser from 'body-parser';
+import express from 'express';
+import AWS from 'aws-sdk';
+
+import getAllGithubData from './github';
+
 const app = express();
-const AWS = require('aws-sdk');
 
 const GITHUB_TABLE = process.env.GITHUB_TABLE;
 const IS_OFFLINE = process.env.IS_OFFLINE;
@@ -22,12 +25,13 @@ app.use(bodyParser.json({ strict: false }));
 
 // Index route
 app.get('/', (req, res) => {
-  res.send(
-    'Want to know a client and a secret?... ' +
-      process.env.GITHUB_CLIENT +
-      ' ' +
-      process.env.GITHUB_SECRET
-  );
+  try {
+    getAllGithubData().then(response => {
+      res.send(response);
+    });
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 // Get Github endpoint
