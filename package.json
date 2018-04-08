@@ -1,10 +1,11 @@
 {
   "name": "serverless-github-data",
   "version": "1.0.0",
-  "description": "A Github statistics fetcher, running on a cron job, with permanent storage to DynamoDB, for the OpenMined community.",
+  "description":
+    "A Github statistics fetcher, running on a cron job, with permanent storage to DynamoDB, for the OpenMined community.",
   "main": "index.js",
   "scripts": {
-    "start": "sls offline start --port 3002",
+    "start": "sls offline --aws-profile openmined start",
     "deploy": "sls deploy --aws-profile openmined --stage prod"
   },
   "keywords": [],

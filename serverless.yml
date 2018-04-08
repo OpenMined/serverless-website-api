@@ -2,13 +2,15 @@ service: serverless-github-data
 
 plugins:
   - serverless-webpack
-  # - serverless-dynamodb-local
+  - serverless-dynamodb-local
   - serverless-offline
 
 custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+  serverless-offline:
+    port: 3002
   tableName: 'github-table-${self:provider.stage}'
   dynamodb:
     start:
@@ -35,11 +37,6 @@ provider:
         - { "Fn::GetAtt": ["GithubDynamoDBTable", "Arn" ] }
 
 functions:
-  app:
-    handler: index.handler
-    events:
-      - http: ANY /
-      - http: 'ANY {proxy+}'
   retrieveGithub:
     handler: index.handler
     events:
@@ -56,11 +53,11 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: id
+            AttributeName: dataId
             AttributeType: S
         KeySchema:
           -
-            AttributeName: id
+            AttributeName: dataId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
