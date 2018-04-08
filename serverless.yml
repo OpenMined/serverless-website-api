@@ -40,14 +40,14 @@ functions:
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
-  getGithub:
+  retrieveGithub:
     handler: index.handler
     events:
-      - http: 'GET /github/{proxy+}'
-  createGithub:
+      - http: 'GET /retrieve'
+  updateGithub:
     handler: index.handler
     events:
-      - http: 'POST /github'
+      - http: 'POST /update'
 
 resources:
   Resources:
@@ -56,11 +56,11 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: githubId
+            AttributeName: id
             AttributeType: S
         KeySchema:
           -
-            AttributeName: githubId
+            AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
