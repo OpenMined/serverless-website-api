@@ -4,6 +4,7 @@ plugins:
   - serverless-webpack
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-domain-manager
 
 custom:
   webpack:
@@ -15,6 +16,10 @@ custom:
   dynamodb:
     start:
       migrate: true
+  customDomain:
+    domainName: stats.openmined.org
+    stage: prod
+    createRoute53Record: true
 
 provider:
   name: aws
