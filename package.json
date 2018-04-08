@@ -5,7 +5,7 @@
     "A Github statistics fetcher, running on a cron job, with permanent storage to DynamoDB, for the OpenMined community.",
   "main": "index.js",
   "scripts": {
-    "start": "sls offline --aws-profile openmined start",
+    "start": "sls offline start",
     "deploy": "sls deploy --aws-profile openmined --stage prod"
   },
   "keywords": [],

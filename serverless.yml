@@ -45,6 +45,7 @@ functions:
     handler: index.handler
     events:
       - http: 'POST /update'
+      - schedule: rate(1 hour)
 
 resources:
   Resources:
