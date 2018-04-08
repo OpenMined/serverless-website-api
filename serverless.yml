@@ -20,6 +20,7 @@ provider:
   name: aws
   runtime: nodejs8.10
   stage: ${opt:stage, 'dev'}
+  profile: openmined
   region: us-east-1
   environment:
     ACCESS_TOKEN: ${file(./env.yml):ACCESS_TOKEN}

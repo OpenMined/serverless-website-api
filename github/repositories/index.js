@@ -6,7 +6,7 @@ import {
 } from '../utils';
 import { print } from 'graphql';
 
-import query from './query.js';
+import query from './query.graphql';
 
 const cleanRepository = repository => {
   repository.shortName = repository.resourcePath.split('/OpenMined/')[1];

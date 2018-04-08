@@ -1,7 +1,7 @@
 import { flattenEdges, apolloFetch } from '../utils';
 import { print } from 'graphql';
 
-import query from './query.js';
+import query from './query.graphql';
 
 export default async () => {
   const getMembers = (limit, cursor) =>

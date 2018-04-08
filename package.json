@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "start": "sls offline start",
-    "deploy": "sls deploy --aws-profile openmined --stage prod"
+    "deploy": "sls deploy -v",
+    "deploy:prod": "sls deploy --stage prod -v"
   },
   "keywords": [],
   "author": "Patrick Cason <me@patrickcason.com>",
