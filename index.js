@@ -1,11 +1,14 @@
 import serverless from 'serverless-http';
 import express from 'express';
+import cors from 'cors';
 
 import getAllGithubData from './github';
 import initDynamoDb from './dynamo';
 
 const app = express();
 const dynamoDb = initDynamoDb();
+
+app.use(cors());
 
 // Retrieve data endpoint
 app.get('/retrieve', (req, res) => {

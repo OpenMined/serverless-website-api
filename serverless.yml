@@ -46,7 +46,10 @@ functions:
   retrieveGithub:
     handler: index.handler
     events:
-      - http: 'GET /retrieve'
+      - http:
+          path: retrieve
+          method: get
+          cors: true
   updateGithub:
     handler: index.handler
     events:
