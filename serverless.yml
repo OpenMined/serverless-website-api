@@ -44,20 +44,19 @@ provider:
 
 functions:
   retrieveGithub:
-    handler: index.handler
+    handler: index.retrieveGithub
     events:
       - http:
           path: retrieve
           method: get
           cors: true
   updateGithub:
-    handler: index.handler
+    handler: index.updateGithub
     events:
-      - http:
-          path: update
-          method: post
-          cors: true
-      - schedule: rate(1 hour)
+      - schedule:
+          name: update-github-cron
+          description: 'Updates our DynamoDB table with the latest Github stats via a CRON job.'
+          rate: rate(1 hour)
 
 resources:
   Resources:

@@ -10,7 +10,6 @@ const dynamoDb = initDynamoDb();
 
 app.use(cors());
 
-// Retrieve data endpoint
 app.get('/retrieve', (req, res) => {
   const params = {
     TableName: process.env.GITHUB_TABLE,
@@ -34,8 +33,9 @@ app.get('/retrieve', (req, res) => {
   });
 });
 
-// Update data endpoint
-app.post('/update', (req, res) => {
+export const retrieveGithub = serverless(app);
+
+export const updateGithub = (event, context, callback) => {
   try {
     getAllGithubData().then(data => {
       const params = {
@@ -48,19 +48,13 @@ app.post('/update', (req, res) => {
 
       dynamoDb.put(params, error => {
         if (error) {
-          console.log('ERROR', error);
-
-          res.status(400).json({ error: 'Could not save data' });
+          callback({ error });
         } else {
-          res.json({ data });
+          callback({ data });
         }
       });
     });
   } catch (error) {
-    console.log('ERROR', error);
-
-    res.status(404).json({ error });
+    callback({ error });
   }
-});
-
-module.exports.handler = serverless(app);
+};

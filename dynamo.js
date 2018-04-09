@@ -1,12 +1,14 @@
 import AWS from 'aws-sdk';
 
 export default () => {
+  let options = {};
+
   if (process.env.IS_OFFLINE) {
-    return new AWS.DynamoDB.DocumentClient({
+    options = {
       region: 'localhost',
       endpoint: 'http://localhost:8000'
-    });
+    };
   }
 
-  return new AWS.DynamoDB.DocumentClient();
+  return new AWS.DynamoDB.DocumentClient(options);
 };
