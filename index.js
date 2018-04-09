@@ -21,8 +21,6 @@ export const deliverGithub = (event, context, callback) => {
     },
     (error, result) => {
       if (error) {
-        console.log('ERROR', error);
-
         callback(null, formResponse({ error: 'Could not get data' }, 400));
       } else {
         if (result && result.Item) {
