@@ -53,7 +53,10 @@ functions:
   updateGithub:
     handler: index.handler
     events:
-      - http: 'POST /update'
+      - http:
+          path: update
+          method: post
+          cors: true
       - schedule: rate(1 hour)
 
 resources:
