@@ -1,60 +1,61 @@
-import serverless from 'serverless-http';
-import express from 'express';
-import cors from 'cors';
-
 import getAllGithubData from './github';
 import initDynamoDb from './dynamo';
 
-const app = express();
 const dynamoDb = initDynamoDb();
 
-app.use(cors());
-
-app.get('/retrieve', (req, res) => {
-  const params = {
-    TableName: process.env.GITHUB_TABLE,
-    Key: {
-      dataId: 'github'
-    }
-  };
-
-  dynamoDb.get(params, (error, result) => {
-    if (error) {
-      console.log('ERROR', error);
-
-      res.status(400).json({ error: 'Could not get data' });
-    } else {
-      if (result && result.Item) {
-        res.json({ data: JSON.parse(result.Item.data) });
-      } else {
-        res.status(404).json({ error: 'Data not found' });
-      }
-    }
-  });
+const formResponse = (body, statusCode = 200) => ({
+  statusCode,
+  headers: {
+    'Access-Control-Allow-Origin': '*'
+  },
+  body: JSON.stringify(body)
 });
 
-export const retrieveGithub = serverless(app);
+export const deliverGithub = (event, context, callback) => {
+  dynamoDb.get(
+    {
+      TableName: process.env.GITHUB_TABLE,
+      Key: {
+        dataId: 'github'
+      }
+    },
+    (error, result) => {
+      if (error) {
+        console.log('ERROR', error);
+
+        callback(null, formResponse({ error: 'Could not get data' }, 400));
+      } else {
+        if (result && result.Item) {
+          callback(null, formResponse({ data: JSON.parse(result.Item.data) }));
+        } else {
+          callback(null, formResponse({ error: 'Data not found' }, 404));
+        }
+      }
+    }
+  );
+};
 
 export const updateGithub = (event, context, callback) => {
   try {
     getAllGithubData().then(data => {
-      const params = {
-        TableName: process.env.GITHUB_TABLE,
-        Item: {
-          dataId: 'github',
-          data: JSON.stringify(data)
+      dynamoDb.put(
+        {
+          TableName: process.env.GITHUB_TABLE,
+          Item: {
+            dataId: 'github',
+            data: JSON.stringify(data)
+          }
+        },
+        error => {
+          if (error) {
+            callback(null, formResponse({ error }, 400));
+          } else {
+            callback(null, formResponse({ data }));
+          }
         }
-      };
-
-      dynamoDb.put(params, error => {
-        if (error) {
-          callback({ error });
-        } else {
-          callback({ data });
-        }
-      });
+      );
     });
   } catch (error) {
-    callback({ error });
+    callback(null, formResponse({ error }, 400));
   }
 };

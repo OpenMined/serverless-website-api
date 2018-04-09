@@ -43,16 +43,20 @@ provider:
         - { "Fn::GetAtt": ["GithubDynamoDBTable", "Arn" ] }
 
 functions:
-  retrieveGithub:
-    handler: index.retrieveGithub
+  deliverGithub:
+    handler: index.deliverGithub
     events:
       - http:
-          path: retrieve
+          path: github
           method: get
           cors: true
   updateGithub:
     handler: index.updateGithub
     events:
+      - http:
+          path: github
+          method: post
+          cors: true
       - schedule:
           name: update-github-cron
           description: 'Updates our DynamoDB table with the latest Github stats via a CRON job.'
