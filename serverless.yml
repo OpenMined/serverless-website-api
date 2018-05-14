@@ -53,6 +53,7 @@ functions:
           cors: true
   updateGithub:
     handler: index.updateGithub
+    timeout: 30
     events:
       - http:
           path: github
