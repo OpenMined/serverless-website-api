@@ -29,6 +29,7 @@ provider:
   region: us-east-1
   environment:
     ACCESS_TOKEN: ${file(./env.yml):ACCESS_TOKEN}
+    MAPBOX_TOKEN: ${file(./env.yml):MAPBOX_TOKEN}
     GITHUB_TABLE: ${self:custom.tableName}
   iamRoleStatements:
     - Effect: Allow
@@ -60,7 +61,7 @@ functions:
       - schedule:
           name: update-github-cron
           description: 'Updates our DynamoDB table with the latest Github stats via a CRON job.'
-          rate: rate(1 hour)
+          rate: rate(1 day)
 
 resources:
   Resources:
