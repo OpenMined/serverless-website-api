@@ -12,7 +12,8 @@ custom:
     includeModules: true
   serverless-offline:
     port: 3002
-  tableName: 'github-table-${self:provider.stage}'
+  githubTableName: 'github-table-${self:provider.stage}'
+  slackTableName: 'slack-table-${self:provider.stage}'
   dynamodb:
     start:
       migrate: true
@@ -30,7 +31,9 @@ provider:
   environment:
     ACCESS_TOKEN: ${file(./env.yml):ACCESS_TOKEN}
     MAPBOX_TOKEN: ${file(./env.yml):MAPBOX_TOKEN}
-    GITHUB_TABLE: ${self:custom.tableName}
+    SLACK_TOKEN: ${file(./env.yml):SLACK_TOKEN}
+    GITHUB_TABLE: ${self:custom.githubTableName}
+    SLACK_TABLE: ${self:custom.slackTableName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -42,6 +45,7 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - { "Fn::GetAtt": ["GithubDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["SlackDynamoDBTable", "Arn" ] }
 
 functions:
   deliverGithub:
@@ -63,6 +67,25 @@ functions:
           name: update-github-cron
           description: 'Updates our DynamoDB table with the latest Github stats via a CRON job.'
           rate: rate(1 day)
+  deliverSlack:
+    handler: index.deliverSlack
+    events:
+      - http:
+          path: slack
+          method: get
+          cors: true
+  updateSlack:
+    handler: index.updateSlack
+    timeout: 30
+    events:
+      - http:
+          path: slack
+          method: post
+          cors: true
+      - schedule:
+          name: update-slack-cron
+          description: 'Updates our DynamoDB table with the latest Slack stats via a CRON job.'
+          rate: rate(1 day)
 
 resources:
   Resources:
@@ -80,4 +103,19 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.githubTableName}
+    SlackDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: dataId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: dataId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.slackTableName}
