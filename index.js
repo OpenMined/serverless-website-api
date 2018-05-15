@@ -24,7 +24,16 @@ export const deliverGithub = (event, context, callback) => {
         callback(null, formResponse({ error: 'Could not get data' }, 400));
       } else {
         if (result && result.Item) {
-          callback(null, formResponse({ data: JSON.parse(result.Item.data) }));
+          const query = event.queryStringParameters;
+          let data = JSON.parse(result.Item.data);
+
+          if (query && query.scope) {
+            data = {
+              [query.scope]: data[query.scope]
+            };
+          }
+
+          callback(null, formResponse(data));
         } else {
           callback(null, formResponse({ error: 'Data not found' }, 404));
         }
@@ -48,7 +57,7 @@ export const updateGithub = (event, context, callback) => {
           if (error) {
             callback(null, formResponse({ error }, 400));
           } else {
-            callback(null, formResponse({ data }));
+            callback(null, formResponse(data));
           }
         }
       );
