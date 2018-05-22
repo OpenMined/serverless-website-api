@@ -14,7 +14,7 @@ export const apolloFetch = createApolloFetch({
     options.headers = {};
   }
 
-  options.headers['Authorization'] = 'bearer ' + process.env.ACCESS_TOKEN;
+  options.headers['Authorization'] = 'bearer ' + process.env.GITHUB_TOKEN;
 
   next();
 });

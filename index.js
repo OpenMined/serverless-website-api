@@ -1,5 +1,6 @@
 import getAllGithubData from './github';
 import getAllSlackData from './slack';
+import getAllGhostData from './ghost';
 import initDynamoDb from './dynamo';
 
 const dynamoDb = initDynamoDb();
@@ -115,6 +116,55 @@ export const updateSlack = (event, context, callback) => {
           TableName: process.env.SLACK_TABLE,
           Item: {
             dataId: 'slack',
+            data: JSON.stringify(data)
+          }
+        },
+        error => {
+          if (error) {
+            callback(null, formResponse({ error }, 400));
+          } else {
+            callback(null, formResponse({ success: true }));
+          }
+        }
+      );
+    });
+  } catch (error) {
+    callback(null, formResponse({ error }, 400));
+  }
+};
+
+export const deliverGhost = (event, context, callback) => {
+  dynamoDb.get(
+    {
+      TableName: process.env.GHOST_TABLE,
+      Key: {
+        dataId: 'ghost'
+      }
+    },
+    (error, result) => {
+      if (error) {
+        callback(null, formResponse({ error: 'Could not get data' }, 400));
+      } else {
+        if (result && result.Item) {
+          const data = JSON.parse(result.Item.data);
+
+          callback(null, formResponse(data));
+        } else {
+          callback(null, formResponse({ error: 'Data not found' }, 404));
+        }
+      }
+    }
+  );
+};
+
+export const updateGhost = (event, context, callback) => {
+  try {
+    getAllGhostData().then(data => {
+      dynamoDb.put(
+        {
+          TableName: process.env.GHOST_TABLE,
+          Item: {
+            dataId: 'ghost',
             data: JSON.stringify(data)
           }
         },

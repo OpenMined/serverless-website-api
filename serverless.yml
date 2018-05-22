@@ -14,6 +14,7 @@ custom:
     port: 3002
   githubTableName: 'github-table-${self:provider.stage}'
   slackTableName: 'slack-table-${self:provider.stage}'
+  ghostTableName: 'ghost-table-${self:provider.stage}'
   dynamodb:
     start:
       migrate: true
@@ -29,11 +30,14 @@ provider:
   profile: openmined
   region: us-east-1
   environment:
-    ACCESS_TOKEN: ${file(./env.yml):ACCESS_TOKEN}
+    GITHUB_TOKEN: ${file(./env.yml):GITHUB_TOKEN}
     MAPBOX_TOKEN: ${file(./env.yml):MAPBOX_TOKEN}
     SLACK_TOKEN: ${file(./env.yml):SLACK_TOKEN}
+    OPENMINED_BLOG_TOKEN: ${file(./env.yml):OPENMINED_BLOG_TOKEN}
+    WEEKLY_DIGS_TOKEN: ${file(./env.yml):WEEKLY_DIGS_TOKEN}
     GITHUB_TABLE: ${self:custom.githubTableName}
     SLACK_TABLE: ${self:custom.slackTableName}
+    GHOST_TABLE: ${self:custom.ghostTableName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -46,6 +50,7 @@ provider:
       Resource:
         - { "Fn::GetAtt": ["GithubDynamoDBTable", "Arn" ] }
         - { "Fn::GetAtt": ["SlackDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["GhostDynamoDBTable", "Arn" ] }
 
 functions:
   deliverGithub:
@@ -86,6 +91,25 @@ functions:
           name: update-slack-cron
           description: 'Updates our DynamoDB table with the latest Slack stats via a CRON job.'
           rate: rate(1 day)
+  deliverGhost:
+    handler: index.deliverGhost
+    events:
+      - http:
+          path: ghost
+          method: get
+          cors: true
+  updateGhost:
+    handler: index.updateGhost
+    timeout: 30
+    events:
+      - http:
+          path: ghost
+          method: post
+          cors: true
+      - schedule:
+          name: update-ghost-cron
+          description: 'Updates our DynamoDB table with the latest Ghost posts via a CRON job.'
+          rate: rate(1 hour)
 
 resources:
   Resources:
@@ -119,3 +143,18 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:custom.slackTableName}
+    GhostDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: dataId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: dataId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.ghostTableName}
