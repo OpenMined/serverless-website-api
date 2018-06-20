@@ -1,4 +1,4 @@
-# Serverless Github data
+# Serverless Website API
 [Our website](https://www.openmined.org) needs to gather some information from Github, Slack, and Ghost to display on screen. Unfortunately, due to rate limiting and view count limitations it doesn't make sense to always ask these services for this information. It's far quicker for us to cache this information elsewhere and retrieve it from there instead.
 
 This code features six functions: `updateGithub`, `deliverGithub`, `updateSlack`, `deliverSlack`, `updateGhost`, and `deliverGhost`. The update functions are run by a cron job on AWS Lambda to get the latest Github repository and membership data, get the latest Slack membership data for the OpenMined community, and get the latest posts made to each of OpenMined's two blogs. It then proceeds to cache this information in a DynamoDB table. The deliver functions are purely a route we can hit to receive this information, pulling from DynamoDB instead of from Github, Slack, and Ghost directly.
