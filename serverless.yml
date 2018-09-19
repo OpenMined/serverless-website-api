@@ -34,7 +34,6 @@ provider:
     MAPBOX_TOKEN: ${file(./env.yml):MAPBOX_TOKEN}
     SLACK_TOKEN: ${file(./env.yml):SLACK_TOKEN}
     OPENMINED_BLOG_TOKEN: ${file(./env.yml):OPENMINED_BLOG_TOKEN}
-    WEEKLY_DIGS_TOKEN: ${file(./env.yml):WEEKLY_DIGS_TOKEN}
     GITHUB_TABLE: ${self:custom.githubTableName}
     SLACK_TABLE: ${self:custom.slackTableName}
     GHOST_TABLE: ${self:custom.ghostTableName}
