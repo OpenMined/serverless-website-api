@@ -27,10 +27,8 @@ export default async () => {
     'openmined-blog',
     process.env.OPENMINED_BLOG_TOKEN
   );
-  const digs = await getPosts('weekly-digs', process.env.WEEKLY_DIGS_TOKEN);
 
   return {
-    blog: blog.posts,
-    digs: digs.posts
+    blog: blog.posts
   };
 };
