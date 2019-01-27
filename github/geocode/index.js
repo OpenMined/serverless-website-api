@@ -19,7 +19,9 @@ export default async members => {
 
     if (member.location) {
       await runGeocode(member.location).then(({ features }) => {
-        member.coords = features[0].center;
+        if(features) {
+          member.coords = features[0].center;
+        }
       });
     }
 

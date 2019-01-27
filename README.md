@@ -9,3 +9,4 @@ This code features six functions: `updateGithub`, `deliverGithub`, `updateSlack`
 3. Install DynamoDB locally: `sls dynamodb install`
 4. Set up your AWS profile or credentials to be used. This is custom to how you want to set up AWS on your computer. It's suggested you set up a profile for OpenMined specifically and run `export AWS_PROFILE="openmined"`. More information [can be found here](https://serverless.com/framework/docs/providers/aws/guide/credentials/).
 5. Run locally: `yarn start`
+6. Populate locally: `yarn populate` (sometimes Github needs to be run multiple times)

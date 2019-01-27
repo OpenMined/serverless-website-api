@@ -7,7 +7,11 @@
   "scripts": {
     "start": "sls offline start",
     "deploy": "sls deploy -v",
-    "deploy:prod": "sls deploy --stage prod -v"
+    "deploy:prod": "sls deploy --stage prod -v",
+    "populate": "yarn populate:ghost && yarn populate:github && yarn populate:slack",
+    "populate:ghost": "curl -X POST http://localhost:3002/ghost",
+    "populate:github": "curl -X POST http://localhost:3002/github",
+    "populate:slack": "curl -X POST http://localhost:3002/slack"
   },
   "keywords": [],
   "author": "Patrick Cason <me@patrickcason.com>",
