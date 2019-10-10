@@ -1,8 +1,7 @@
 {
   "name": "serverless-website-api",
   "version": "1.0.0",
-  "description":
-    "An OpenMined statistics fetcher, running on cron jobs, with permanent storage to DynamoDB.",
+  "description": "An OpenMined statistics fetcher, running on cron jobs, with permanent storage to DynamoDB.",
   "main": "index.js",
   "scripts": {
     "start": "sls offline start",
@@ -30,7 +29,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-3": "^6.24.1",
-    "serverless-domain-manager": "^2.3.6",
+    "serverless-domain-manager": "3.3.0",
     "serverless-offline": "^3.20.1",
     "serverless-webpack": "^5.1.1",
     "webpack": "^4.5.0",
