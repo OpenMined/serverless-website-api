@@ -12,9 +12,9 @@ custom:
     includeModules: true
   serverless-offline:
     port: 3002
-  githubTableName: 'github-table-${self:provider.stage}'
-  slackTableName: 'slack-table-${self:provider.stage}'
-  ghostTableName: 'ghost-table-${self:provider.stage}'
+  githubTableName: "github-table-${self:provider.stage}"
+  slackTableName: "slack-table-${self:provider.stage}"
+  ghostTableName: "ghost-table-${self:provider.stage}"
   dynamodb:
     start:
       migrate: true
@@ -22,6 +22,7 @@ custom:
     domainName: stats.openmined.org
     stage: prod
     createRoute53Record: true
+    certificateArn: arn:aws:acm:us-east-1:273848247695:certificate/5dfde36f-db45-4557-bf88-8fcd42cbc2a5
 
 provider:
   name: aws
@@ -47,9 +48,9 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["GithubDynamoDBTable", "Arn" ] }
-        - { "Fn::GetAtt": ["SlackDynamoDBTable", "Arn" ] }
-        - { "Fn::GetAtt": ["GhostDynamoDBTable", "Arn" ] }
+        - { "Fn::GetAtt": ["GithubDynamoDBTable", "Arn"] }
+        - { "Fn::GetAtt": ["SlackDynamoDBTable", "Arn"] }
+        - { "Fn::GetAtt": ["GhostDynamoDBTable", "Arn"] }
 
 functions:
   deliverGithub:
@@ -69,7 +70,7 @@ functions:
           cors: true
       - schedule:
           name: update-github-cron
-          description: 'Updates our DynamoDB table with the latest Github stats via a CRON job.'
+          description: "Updates our DynamoDB table with the latest Github stats via a CRON job."
           rate: rate(1 day)
   deliverSlack:
     handler: index.deliverSlack
@@ -88,7 +89,7 @@ functions:
           cors: true
       - schedule:
           name: update-slack-cron
-          description: 'Updates our DynamoDB table with the latest Slack stats via a CRON job.'
+          description: "Updates our DynamoDB table with the latest Slack stats via a CRON job."
           rate: rate(1 day)
   deliverGhost:
     handler: index.deliverGhost
@@ -107,51 +108,45 @@ functions:
           cors: true
       - schedule:
           name: update-ghost-cron
-          description: 'Updates our DynamoDB table with the latest Ghost posts via a CRON job.'
+          description: "Updates our DynamoDB table with the latest Ghost posts via a CRON job."
           rate: rate(1 hour)
 
 resources:
   Resources:
     GithubDynamoDBTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: dataId
+          - AttributeName: dataId
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: dataId
+          - AttributeName: dataId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:custom.githubTableName}
     SlackDynamoDBTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: dataId
+          - AttributeName: dataId
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: dataId
+          - AttributeName: dataId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:custom.slackTableName}
     GhostDynamoDBTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
-          -
-            AttributeName: dataId
+          - AttributeName: dataId
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: dataId
+          - AttributeName: dataId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
