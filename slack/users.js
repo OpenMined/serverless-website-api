@@ -33,7 +33,7 @@ export default async () => {
     return false;
   };
 
-  const limit = 200;
+  const limit = 500;
   let users = [];
 
   const firstCall = await getUserList(limit);

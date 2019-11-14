@@ -10,3 +10,4 @@ env.yml
 # lock files
 yarn.lock
 package-lock.json
+pnpm-debug.log
