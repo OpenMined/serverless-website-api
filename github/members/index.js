@@ -15,7 +15,7 @@ export default async () => {
   const limit = 100;
   const firstCall = await getMembers(limit);
 
-  const { totalCount, edges } = firstCall.data.organization.members;
+  const { totalCount, edges } = firstCall.data.organization.membersWithRole;
   const numOfExtraRuns = Math.floor((totalCount - 1) / limit);
 
   let lastCursor = edges[edges.length - 1].cursor;
@@ -23,7 +23,7 @@ export default async () => {
 
   for (let i = 0; i < numOfExtraRuns; i++) {
     await getMembers(limit, lastCursor).then(({ data }) => {
-      let newEdges = data.organization.members.edges;
+      let newEdges = data.organization.membersWithRole.edges;
 
       members = [...members, ...newEdges.map(flattenEdges)];
       lastCursor = newEdges[newEdges.length - 1].cursor;

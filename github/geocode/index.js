@@ -2,7 +2,7 @@ export default async members => {
   const runGeocode = request =>
     fetch(
       'https://api.mapbox.com/geocoding/v5/mapbox.places/' +
-        request +
+        encodeURIComponent(request) +
         '.json?access_token=' +
         process.env.MAPBOX_TOKEN +
         '&limit=1'

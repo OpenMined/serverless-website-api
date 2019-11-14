@@ -2,6 +2,11 @@
 /node_modules
 /.serverless
 /.webpack
+/.dynamodb
 
 # environment variables
 env.yml
+
+# lock files
+yarn.lock
+package-lock.json

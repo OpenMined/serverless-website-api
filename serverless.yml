@@ -18,6 +18,8 @@ custom:
   dynamodb:
     start:
       migrate: true
+    stages:
+      - dev
   customDomain:
     domainName: stats.openmined.org
     stage: prod

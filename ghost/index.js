@@ -1,29 +1,27 @@
+import GhostContentAPI from '@tryghost/content-api'
+
 export default async () => {
-  const params =
-    'limit=10&fields=id,title,slug,feature_image,custom_excerpt,url,published_at';
+  const api = new GhostContentAPI({
+    url: 'https://blog.openmined.org',
+    key: process.env.OPENMINED_BLOG_TOKEN,
+    version: "v3"
+  });
 
-  const getPosts = token =>
-    fetch(
-      'https://blog.openmined.org/ghost/api/v0.1/posts? ' +
-        params +
-        '&client_id=ghost-frontend&client_secret=' +
-        token
-    )
-      .then(res => res.json())
-      .then(res => {
-        if (res.errors) {
-          throw new Error(res.error);
-        }
+  const getPosts = () =>
+    api.posts
+      .browse({ limit: 10, fields: 'id,title,slug,feature_image,custom_excerpt,url,published_at' })
+      .then(posts => {
+        delete posts.meta;
 
-        return res;
+        return posts;
       })
-      .catch(error => {
-        throw new Error(error);
+      .catch((err) => {
+        throw new Error(err);
       });
 
-  const blog = await getPosts(process.env.OPENMINED_BLOG_TOKEN);
+  const blog = await getPosts();
 
   return {
-    blog: blog.posts
+    blog
   };
 };
