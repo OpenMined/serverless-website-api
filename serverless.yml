@@ -52,6 +52,7 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
         - dynamodb:BatchWriteItem
+        - dynamodb:DescribeTable
       Resource:
         - { "Fn::GetAtt": ["GithubMembersDynamoDBTable", "Arn"] }
         - { "Fn::GetAtt": ["GithubReposDynamoDBTable", "Arn"] }
