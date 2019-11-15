@@ -12,7 +12,8 @@ custom:
     includeModules: true
   serverless-offline:
     port: 3002
-  githubTableName: "github-table-${self:provider.stage}"
+  githubMembersTableName: "github-members-table-${self:provider.stage}"
+  githubReposTableName: "github-repos-table-${self:provider.stage}"
   slackTableName: "slack-table-${self:provider.stage}"
   ghostTableName: "ghost-table-${self:provider.stage}"
   dynamodb:
@@ -37,7 +38,8 @@ provider:
     MAPBOX_TOKEN: ${file(./env.yml):MAPBOX_TOKEN}
     SLACK_TOKEN: ${file(./env.yml):SLACK_TOKEN}
     OPENMINED_BLOG_TOKEN: ${file(./env.yml):OPENMINED_BLOG_TOKEN}
-    GITHUB_TABLE: ${self:custom.githubTableName}
+    GITHUB_MEMBERS_TABLE: ${self:custom.githubMembersTableName}
+    GITHUB_REPOS_TABLE: ${self:custom.githubReposTableName}
     SLACK_TABLE: ${self:custom.slackTableName}
     GHOST_TABLE: ${self:custom.ghostTableName}
   iamRoleStatements:
@@ -50,7 +52,8 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["GithubDynamoDBTable", "Arn"] }
+        - { "Fn::GetAtt": ["GithubMembersDynamoDBTable", "Arn"] }
+        - { "Fn::GetAtt": ["GithubReposDynamoDBTable", "Arn"] }
         - { "Fn::GetAtt": ["SlackDynamoDBTable", "Arn"] }
         - { "Fn::GetAtt": ["GhostDynamoDBTable", "Arn"] }
 
@@ -115,27 +118,40 @@ functions:
 
 resources:
   Resources:
-    GithubDynamoDBTable:
+    GithubMembersDynamoDBTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
-          - AttributeName: dataId
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: dataId
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:custom.githubTableName}
+        TableName: ${self:custom.githubMembersTableName}
+    GithubReposDynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.githubReposTableName}
     SlackDynamoDBTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
-          - AttributeName: dataId
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: dataId
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

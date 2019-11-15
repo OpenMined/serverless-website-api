@@ -10,5 +10,11 @@ export default () => {
     };
   }
 
-  return new AWS.DynamoDB.DocumentClient(options);
+  const client = new AWS.DynamoDB();
+  const docClient = new AWS.DynamoDB.DocumentClient(options);
+
+  return {
+    client,
+    dynamoDb: docClient
+  };
 };

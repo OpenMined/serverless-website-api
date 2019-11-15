@@ -4,6 +4,9 @@
 /.webpack
 /.dynamodb
 
+# samples
+/samples
+
 # environment variables
 env.yml
 

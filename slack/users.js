@@ -1,3 +1,5 @@
+import { loadFromOffline, saveToOffline } from '../_helpers';
+
 export default async () => {
   const getUserList = (limit, cursor = '') =>
     fetch(
@@ -26,12 +28,23 @@ export default async () => {
         id: item.id,
         screenname: item.name,
         name: item.real_name,
-        email: item.profile.email
+        email: item.profile.email,
+        avatar: item.profile.image_512,
+        timezone: item.tz
       };
     }
 
     return false;
   };
+
+  const offlinePath = 'samples/slack.json';
+  const offlineData = loadFromOffline(offlinePath);
+
+  if(offlineData) {
+    console.log('Reading from file instead...');
+
+    return offlineData;
+  }
 
   const limit = 500;
   let users = [];
@@ -56,10 +69,11 @@ export default async () => {
     await loopCalls(firstCall);
   }
 
-  return {
-    metadata: {
-      count: users.length
-    },
+  const response = {
     members: users
   };
+
+  saveToOffline(offlinePath, response);
+
+  return response;
 };
