@@ -156,8 +156,8 @@ resources:
           - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 10
         TableName: ${self:custom.slackTableName}
     GhostDynamoDBTable:
       Type: "AWS::DynamoDB::Table"
