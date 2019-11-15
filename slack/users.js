@@ -23,7 +23,7 @@ export default async () => {
       });
 
   const flattenUser = item => {
-    if (!item.is_bot) {
+    if (item && !item.is_bot) {
       return {
         id: item.id,
         screenname: item.name,
@@ -34,7 +34,7 @@ export default async () => {
       };
     }
 
-    return false;
+    return;
   };
 
   const offlinePath = 'samples/slack.json';
@@ -70,7 +70,7 @@ export default async () => {
   }
 
   const response = {
-    members: users
+    members: users.filter(n => n)
   };
 
   saveToOffline(offlinePath, response);

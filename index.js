@@ -23,8 +23,6 @@ const batchUpdate = (table, values, key) => {
     chunkedData.push(values.slice(i, i + chunkSize));
   }
 
-  let chunksWrittenSuccessfully = 0;
-
   chunkedData.forEach(arr => {
     let params = {
       RequestItems: {
@@ -39,22 +37,12 @@ const batchUpdate = (table, values, key) => {
       }
     };
 
-    const promise = dynamoDb.batchWrite(params, error => {
-      if (error) return error;
-
-      chunksWrittenSuccessfully += 1;
-    }).promise();
+    const promise = dynamoDb.batchWrite(params).promise();
 
     allUpdates.push(promise);
   });
 
-  Promise.all(allUpdates).then(() => {
-    console.log(chunksWrittenSuccessfully, chunkedData.length);
-
-    if(chunksWrittenSuccessfully >= chunkedData.length) return true;
-
-    return false;
-  });
+  return Promise.all(allUpdates);
 };
 
 const scanTable = async (tableName) => {
@@ -85,9 +73,7 @@ export const deliverGithub = (event, context, callback) => {
         repositories: data[1]
       }));
     }).catch(error => {
-      console.log(error);
-
-      callback(null, formResponse({ error: 'Could not get data' }, 400));
+      callback(null, formResponse({ error }, 400));
     });
 };
 
@@ -97,17 +83,11 @@ export const updateGithub = (event, context, callback) => {
       const membersUpdated = batchUpdate(process.env.GITHUB_MEMBERS_TABLE, data.members, 'login');
       const reposUpdated = batchUpdate(process.env.GITHUB_REPOS_TABLE, data.repositories, 'name');
 
-      if(typeof membersUpdated === 'boolean' && typeof reposUpdated === 'boolean' && membersUpdated && reposUpdated) {
+      Promise.all([membersUpdated, reposUpdated]).then(() => {
         callback(null, formResponse({ success: true }));
-      } else {
-        if(typeof membersUpdated !== 'boolean') {
-          callback(null, formResponse({ error: membersUpdated }, 400));
-        } else if(typeof reposUpdated !== 'boolean') {
-          callback(null, formResponse({ error: reposUpdated }, 400));
-        }
-
-        callback(null, formResponse({ error: 'Never finished?' }, 400));
-      }
+      }).catch(error => {
+        callback(null, formResponse({ error }, 400));
+      });
     });
   } catch (error) {
     callback(null, formResponse({ error }, 400));
@@ -126,16 +106,12 @@ export const deliverSlack = (event, context, callback) => {
           members: data[0],
         }));
       }).catch(error => {
-        console.log(error);
-
-        callback(null, formResponse({ error: 'Could not get data' }, 400));
+        callback(null, formResponse({ error }, 400));
       });
   } else {
     client.describeTable({ TableName: process.env.SLACK_TABLE }, (error, data) => {
-      console.log(error, data);
-
       if(error) {
-        callback(null, formResponse({ error: 'Could not get data' }, 400));
+        callback(null, formResponse({ error }, 400));
       } else {
         const numMembers = data['Table']['ItemCount'];
 
@@ -154,15 +130,11 @@ export const updateSlack = (event, context, callback) => {
     getAllSlackData().then(data => {
       const membersUpdated = batchUpdate(process.env.SLACK_TABLE, data.members, 'id');
 
-      if(typeof membersUpdated === 'boolean' && membersUpdated) {
+      Promise.all([membersUpdated]).then(() => {
         callback(null, formResponse({ success: true }));
-      } else {
-        if(typeof membersUpdated !== 'boolean') {
-          callback(null, formResponse({ error: membersUpdated }, 400));
-        }
-
-        callback(null, formResponse({ error: 'Never finished?' }, 400));
-      }
+      }).catch(error => {
+        callback(null, formResponse({ error }, 400));
+      });
     });
   } catch (error) {
     callback(null, formResponse({ error }, 400));
@@ -170,48 +142,28 @@ export const updateSlack = (event, context, callback) => {
 };
 
 export const deliverGhost = (event, context, callback) => {
-  dynamoDb.get(
-    {
-      TableName: process.env.GHOST_TABLE,
-      Key: {
-        dataId: 'ghost'
-      }
-    },
-    (error, result) => {
-      if (error) {
-        callback(null, formResponse({ error: 'Could not get data' }, 400));
-      } else {
-        if (result && result.Item) {
-          const data = JSON.parse(result.Item.data);
+  const posts = scanTable(process.env.GHOST_TABLE);
 
-          callback(null, formResponse(data));
-        } else {
-          callback(null, formResponse({ error: 'Data not found' }, 404));
-        }
-      }
-    }
-  );
+  Promise.all([posts])
+    .then(data => {
+      callback(null, formResponse({
+        blog: data[0],
+      }));
+    }).catch(error => {
+      callback(null, formResponse({ error }, 400));
+    });
 };
 
 export const updateGhost = (event, context, callback) => {
   try {
     getAllGhostData().then(data => {
-      dynamoDb.put(
-        {
-          TableName: process.env.GHOST_TABLE,
-          Item: {
-            dataId: 'ghost',
-            data: JSON.stringify(data)
-          }
-        },
-        error => {
-          if (error) {
-            callback(null, formResponse({ error }, 400));
-          } else {
-            callback(null, formResponse({ success: true }));
-          }
-        }
-      );
+      const postsUpdated = batchUpdate(process.env.GHOST_TABLE, data.blog, 'id');
+
+      Promise.all([postsUpdated]).then(() => {
+        callback(null, formResponse({ success: true }));
+      }).catch(error => {
+        callback(null, formResponse({ error }, 400));
+      });
     });
   } catch (error) {
     callback(null, formResponse({ error }, 400));

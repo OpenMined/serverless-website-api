@@ -20,7 +20,7 @@ export default async () => {
 
   const getPosts = () =>
     api.posts
-      .browse({ limit: 10, fields: 'id,title,slug,feature_image,custom_excerpt,url,published_at' })
+      .browse({ limit: 'all', fields: 'id,title,slug,feature_image,custom_excerpt,url,published_at' })
       .then(posts => {
         delete posts.meta;
 
