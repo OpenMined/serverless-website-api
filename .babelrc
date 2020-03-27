@@ -1,4 +1,4 @@
 {
-  "plugins": ["transform-runtime"],
-  "presets": [["env", { "node": "8.10" }], "stage-3"]
+  "plugins": ["@babel/plugin-transform-runtime"],
+  "presets": ["@babel/preset-env"]
 }
