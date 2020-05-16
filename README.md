@@ -1,3 +1,7 @@
+# DEPRECATION NOTICE
+
+Warning, this repository will soon be deprecated in favor of [openmined-website](https://github.com/OpenMined/openmined-website).
+
 # Serverless Website API
 [Our website](https://www.openmined.org) needs to gather some information from Github, Slack, and Ghost to display on screen. Unfortunately, due to rate limiting and view count limitations it doesn't make sense to always ask these services for this information. It's far quicker for us to cache this information elsewhere and retrieve it from there instead.
 
